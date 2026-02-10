@@ -1,0 +1,16 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>nhonlv.soict</groupId>
+    <artifactId>fintech-payments-platform</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>common</artifactId>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <!-- keep empty for now; we'll add shared error model + correlation utilities later -->
+  </dependencies>
+</project>
