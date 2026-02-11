@@ -11,6 +11,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "payments")
+
 public class Payment {
 
   @Id
@@ -35,6 +36,16 @@ public class Payment {
 
   protected Payment() {
     // JPA only
+  }
+
+  public Payment(UUID id, UUID clientId, long amountMinor, String currency, PaymentStatus status,
+      OffsetDateTime createdAt) {
+    this.id = id;
+    this.clientId = clientId;
+    this.amountMinor = amountMinor;
+    this.currency = currency;
+    this.status = status;
+    this.createdAt = createdAt;
   }
 
   public UUID getId() {
