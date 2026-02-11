@@ -1,6 +1,7 @@
 package nhonlv.soict.banking_platform_service.payments.service;
 
 import java.time.OffsetDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import nhonlv.soict.banking_platform_service.payments.api.dto.CreatePaymentRequest;
 import nhonlv.soict.banking_platform_service.payments.api.dto.CreatePaymentResponse;
@@ -33,5 +34,9 @@ public class PaymentService {
         savedPayment.getStatus(),
         savedPayment.getCreatedAt()
     );
+  }
+
+  public Optional<Payment> getById(UUID id) {
+    return paymentRepository.findById(id);
   }
 }
