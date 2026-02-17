@@ -10,6 +10,15 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
+      server:
+        webmvc:
+          routes:
+            - id: banking-platform
+              uri: lb://banking-platform-service
+              predicates:
+                - Path=/banking-platform-service/**
+              filters:
+                - StripPrefix=1
   security:
     user:
       name: user
@@ -24,4 +33,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,gateway
+  endpoint:
+    gateway:
+      enabled: true
