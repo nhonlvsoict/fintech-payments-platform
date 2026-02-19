@@ -67,11 +67,7 @@ public class PaymentService {
 
     Payment savedPayment = paymentRepository.save(payment);
 
-    CreatePaymentResponse response = new CreatePaymentResponse(
-        savedPayment.getId(),
-        savedPayment.getStatus(),
-        savedPayment.getCreatedAt()
-    );
+    CreatePaymentResponse response = CreatePaymentResponse.from(savedPayment);
 
     newRecord.markCompleted(201, toJson(response), OffsetDateTime.now());
     idempotencyKeyRepository.save(newRecord);
