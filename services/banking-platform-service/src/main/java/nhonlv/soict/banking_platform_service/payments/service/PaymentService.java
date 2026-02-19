@@ -6,8 +6,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import nhonlv.soict.banking_platform_service.outbox.domain.OutboxEvent;
+import nhonlv.soict.banking_platform_service.outbox.repo.OutboxEventRepository;
 import nhonlv.soict.banking_platform_service.payments.api.dto.CreatePaymentRequest;
 import nhonlv.soict.banking_platform_service.payments.api.dto.CreatePaymentResponse;
 import nhonlv.soict.banking_platform_service.payments.domain.IdempotencyKey;
@@ -24,13 +28,16 @@ public class PaymentService {
 
   private final PaymentRepository paymentRepository;
   private final IdempotencyKeyRepository idempotencyKeyRepository;
+  private final OutboxEventRepository outboxEventRepository;
   private final ObjectMapper objectMapper;
 
   public PaymentService(PaymentRepository paymentRepository,
       IdempotencyKeyRepository idempotencyKeyRepository,
+      OutboxEventRepository outboxEventRepository,
       ObjectMapper objectMapper) {
     this.paymentRepository = paymentRepository;
     this.idempotencyKeyRepository = idempotencyKeyRepository;
+    this.outboxEventRepository = outboxEventRepository;
     this.objectMapper = objectMapper;
   }
 
@@ -66,6 +73,13 @@ public class PaymentService {
         OffsetDateTime.now());
 
     Payment savedPayment = paymentRepository.save(payment);
+  
+    OutboxEvent outboxEvent = OutboxEvent.paymentProcessRequested(
+      savedPayment.getId(), 
+      buildOutboxPayload(savedPayment.getId(), req.clientId(), req.rail())
+    );
+ 
+    outboxEventRepository.save(outboxEvent);
 
     CreatePaymentResponse response = CreatePaymentResponse.from(savedPayment);
 
@@ -119,6 +133,18 @@ public class PaymentService {
       return objectMapper.readValue(responseBody, CreatePaymentResponse.class);
     } catch (JsonProcessingException e) {
       throw new IllegalStateException("Unable to deserialize stored create payment response", e);
+    }
+  }
+
+  private String buildOutboxPayload(UUID paymentId, UUID clientId, String rail) {
+    Map<String, String> payload = new LinkedHashMap<>();
+    payload.put("paymentId", paymentId.toString());
+    payload.put("clientId", clientId.toString());
+    payload.put("rail", rail);
+    try {
+      return objectMapper.writeValueAsString(payload);
+    } catch (JsonProcessingException e) {
+      throw new IllegalStateException("Unable to serialize outbox payload", e);
     }
   }
 }

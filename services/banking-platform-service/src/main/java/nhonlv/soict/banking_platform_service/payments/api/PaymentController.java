@@ -9,6 +9,7 @@ import nhonlv.soict.banking_platform_service.payments.api.dto.CreatePaymentRespo
 import nhonlv.soict.banking_platform_service.payments.api.dto.PaymentResponse;
 import nhonlv.soict.banking_platform_service.payments.service.CreatePaymentResult;
 import nhonlv.soict.banking_platform_service.payments.service.PaymentService;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,10 +53,11 @@ public class PaymentController {
     }
 
     CreatePaymentResponse response = result.response();
-    URI location = URI.create("/v1/payments/" + response.paymentId());
     if (result.type() == CreatePaymentResult.ResultType.COMPLETED) {
       return ResponseEntity.ok(ApiResponse.success(response));
     }
+
+    URI location = URI.create("/v1/payments/" + response.paymentId());
     return ResponseEntity.created(location).body(ApiResponse.success(response));
   }
 
